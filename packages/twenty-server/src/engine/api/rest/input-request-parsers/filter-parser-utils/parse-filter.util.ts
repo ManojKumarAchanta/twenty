@@ -17,24 +17,13 @@ export enum Conjunctions {
   not = 'not',
 }
 
-export const ROOT_FILTER_CONJUNCTION_REGEX = new RegExp(
-  `^(${Object.values(Conjunctions).join('|')})\\((.+)\\)$`,
-);
-
 export const parseFilter = (
   filterQuery: string,
 ): Record<string, FieldValue> => {
   const result = {};
-  const match = filterQuery.match(ROOT_FILTER_CONJUNCTION_REGEX);
+  const conjunction = parseRootFilterConjunction(filterQuery);
 
-  if (match) {
-    const conjunction = match?.[1];
-
-    if (!conjunction) {
-      throw new BadRequestException(
-        'Error while matching filter query. Conjunction not found',
-      );
-    }
+  if (conjunction) {
     const subResult = parseFilterContent(filterQuery).map((elem) =>
       parseFilter(elem),
     );
@@ -55,6 +44,10 @@ export const parseFilter = (
     }
 
     return result;
+  } else {
+    throw new BadRequestException(
+      'Error while matching filter query. Conjunction not found',
+    );
   }
   const { fields, comparator, value } = parseBaseFilter(filterQuery);
 

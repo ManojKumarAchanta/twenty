@@ -4,6 +4,7 @@ import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { type FieldValue } from 'src/engine/api/rest/core/types/field-value.type';
+import { parseArrayValues } from 'src/engine/api/rest/input-request-parsers/filter-parser-utils/parse-array-values.util';
 
 export const formatFieldValue = (
   value: string,
@@ -18,9 +19,9 @@ export const formatFieldValue = (
     }
     const stringValues = value.substring(1, value.length - 1);
 
-    return stringValues
-      .split(',')
-      .map((value) => formatFieldValue(value, fieldType));
+    return parseArrayValues(stringValues).map((value) =>
+      formatFieldValue(value, fieldType),
+    );
   }
   if (comparator === 'is') {
     return value;

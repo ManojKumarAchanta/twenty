@@ -7,22 +7,30 @@ export const parseFilterContent = (filterQuery: string): string[] => {
   let currentPredicates = '';
 
   for (const c of filterQuery) {
-    let shouldPersistCharacter = parenthesisCounter >= 1;
+    if (c === '"' && !isWithinSingleQuotes) {
+      isWithinDoubleQuotes = !isWithinDoubleQuotes;
+    } else if (c === "'" && !isWithinDoubleQuotes) {
+      isWithinSingleQuotes = !isWithinSingleQuotes;
+    }
+
+    if (isWithinDoubleQuotes || isWithinSingleQuotes) {
+      if (parenthesisCounter >= 1) currentPredicates += c;
+      continue;
+    }
 
     if (c === '(') {
       parenthesisCounter++;
+      if (parenthesisCounter >= 2) currentPredicates += c;
+      continue;
     }
 
     if (c === ')') {
       parenthesisCounter--;
-      shouldPersistCharacter = parenthesisCounter >= 1;
+      if (parenthesisCounter >= 1) currentPredicates += c;
+      continue;
     }
 
     if (['[', ']'].includes(c)) isWithinBrackets = !isWithinBrackets;
-
-    if (c === '"') isWithinDoubleQuotes = !isWithinDoubleQuotes;
-
-    if (c === "'") isWithinSingleQuotes = !isWithinSingleQuotes;
 
     if (
       c === ',' &&
@@ -33,10 +41,9 @@ export const parseFilterContent = (filterQuery: string): string[] => {
     ) {
       predicates.push(currentPredicates);
       currentPredicates = '';
-      shouldPersistCharacter = false;
     }
 
-    if (shouldPersistCharacter) currentPredicates += c;
+    if (parenthesisCounter >= 1) currentPredicates += c;
   }
 
   predicates.push(currentPredicates);

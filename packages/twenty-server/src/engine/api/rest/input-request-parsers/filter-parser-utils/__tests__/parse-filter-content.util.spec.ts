@@ -45,10 +45,21 @@ describe('parseFilterContent', () => {
       'fieldText[eq]:"val,ue"',
     ]);
   });
+  it('should parse query filter with apostrophy in value ', () => {
+    expect(parseFilterContent('and(fieldText[eq]:"val\'ue")')).toEqual([
+      'fieldText[eq]:"val\'ue"',
+    ]);
+  });
 
   it('should parse query filter with comma in value ', () => {
     expect(parseFilterContent("and(fieldText[eq]:'val,ue')")).toEqual([
       "fieldText[eq]:'val,ue'",
     ]);
+  });
+
+  it('should parse query filter with parentheses and brackets in quoted values', () => {
+    expect(
+      parseFilterContent(`and(fieldText[eq]:"value (with), [delimiters]")`),
+    ).toEqual([`fieldText[eq]:"value (with), [delimiters]"`]);
   });
 });

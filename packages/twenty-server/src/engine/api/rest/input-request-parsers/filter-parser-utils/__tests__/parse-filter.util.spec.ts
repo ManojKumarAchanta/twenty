@@ -79,4 +79,19 @@ describe('parseFilter', () => {
       ],
     });
   });
+
+  it('should combine multiple root conjunctions with and', () => {
+    expect(
+      parseFilter(
+        'and(or(city[eq]:"Paris",city[eq]:"Lyon"),not(name[eq]:"Bob"))',
+      ),
+    ).toEqual({
+      and: [
+        {
+          or: [{ city: { eq: 'Paris' } }, { city: { eq: 'Lyon' } }],
+        },
+        { not: { name: { eq: 'Bob' } } },
+      ],
+    });
+  });
 });

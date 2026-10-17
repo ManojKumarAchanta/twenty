@@ -32,4 +32,12 @@ describe('addDefaultConjunctionIfMissing', () => {
       'not(field[eq]:1)',
     );
   });
+
+  it('should add default conjunction for multiple root conjunctions', () => {
+    expect(
+      addDefaultConjunctionIfMissing(
+        'or(city[eq]:"Paris",city[eq]:"Lyon"),not(name[eq]:"Bob")',
+      ),
+    ).toEqual('and(or(city[eq]:"Paris",city[eq]:"Lyon"),not(name[eq]:"Bob"))');
+  });
 });
